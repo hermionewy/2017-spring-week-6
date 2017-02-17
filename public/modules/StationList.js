@@ -1,4 +1,6 @@
 function StationList(){
+	var _dis=d3.dispatch('stationselect');
+
 	var exports = function(selection){
 		var arr = selection.datum();
 
@@ -24,6 +26,11 @@ function StationList(){
 			.on('click',function(d){
 				d3.event.preventDefault();
 			});
+			exports.on = function(){
+				//usertype = station select
+				//callback =function(id){ console.log(id)}
+
+			}
 	}
 
 	return exports;

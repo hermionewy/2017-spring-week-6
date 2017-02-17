@@ -1,12 +1,24 @@
 console.log(d3);
 
+// d3.select('body').on('click', function(d){
+// 	console.log(d);
+// 	console.log(d3.event);
+// 	console.log(this); //DOM element, not the selection
+// 	//console.log(d3.select(this).attr('width')); this should work
+// })
+// var dis = d3.dispatch('customEvent1');
+// dis.on('customEvent1', function(name){ console.log('hello '+ name)});
+// dis.on('customEvent1.name', function(){ console.log('world')});
+// dis.call('customEvent1','this is a context', 'yw');
+
+
 d3.queue()
 	.defer(d3.csv,'./data/hubway_trips_reduced.csv',parseTrips)
 	.defer(d3.csv,'./data/hubway_stations.csv',parseStations)
 	.await(dataLoaded);
 
 function dataLoaded(err,trips,stations){
-	
+
 	//Data model
 	var cf = crossfilter(trips);
 	var tripsByStartTime = cf.dimension(function(d){return d.startTime}),
@@ -29,10 +41,21 @@ function dataLoaded(err,trips,stations){
 		.call(piechartByUserGender);
 
 	//UI module
-	var startStationList = StationList();
+	var startStationList = StationList()
+		 .on('startStationList', function(d){ console.log(d.id)});
 	var endStationList = StationList();
 	d3.select('#start-station').datum(stations).call(startStationList);
 	d3.select('#end-station').datum(stations).call(endStationList);
+
+// listen to the dispatcher
+	dispatcher.on('timerange:select', function(range){
+		tripsByStartTime.filter(range);
+	d3.select('#plot2').datum(tripsByStartTime.top(Infinity))
+			.call(piechartByUserType);
+	d3.select('#plot3').datum(tripsByStartTime.top(Infinity).filter(function(d){ return d.userGender}))
+		  .call(piechartByUserGender);
+	});
+
 }
 
 function parseTrips(d){

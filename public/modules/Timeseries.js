@@ -102,6 +102,10 @@ function Timeseries(){
 		var t0 = scaleX.invert(d3.event.selection[0]),
 			t1 = scaleX.invert(d3.event.selection[1]);
 		console.log([t0,t1]);
+		var range =[t0,t1];
+		dispatcher.call('timerange:select', this, range);
+
+
 	}
 
 	//setting config values
